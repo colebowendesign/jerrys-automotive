@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jerry's Automotive Repair, Inc. — Hattiesburg, MS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Oswald:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent:        #9C0000;
+      --accent-bright: #CC2200;
+      --accent-glow:   rgba(156, 0, 0, 0.38);
+      --bg:            #161210;
+      --bg-card:       rgba(156, 0, 0, 0.07);
+      --text-primary:  #F5F0EB;
+      --text-secondary:#9C8C7C;
+      --border:        rgba(156, 0, 0, 0.22);
+      --font-display:  'Playfair Display', Georgia, serif;
+      --font-body:     'Source Serif 4', Georgia, serif;
+      --font-cap:      'Oswald', 'Arial Narrow', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: auto; }
+    body {
+      background-color: var(--bg);
+      /* Automotive shop floor: subtle 2-tone checker with grout lines */
+      background-image:
+        linear-gradient(rgba(0,0,0,0.55) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.55) 1px, transparent 1px),
+        repeating-conic-gradient(#1c1915 0% 25%, #131110 0% 50%);
+      background-size:
+        60px 60px,
+        60px 60px,
+        120px 120px;
+      background-attachment: fixed;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+    }
+    /* Vignette to fade the tile pattern into darkness at edges */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse 80% 70% at 50% 50%,
+        transparent 40%,
+        rgba(14, 11, 9, 0.55) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    ::selection { background: var(--accent); color: #fff; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0d0a08; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(var(--accent), var(--accent-bright));
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover { box-shadow: 0 0 8px var(--accent-glow); }
+
+    /* ── Scroll Progress ── */
+    #scroll-progress {
+      position: fixed; top: 0; left: 0;
+      width: 0%; height: 3px;
+      background: linear-gradient(90deg, #6B0000, var(--accent), var(--accent-bright));
+      z-index: 1000;
+      box-shadow: 0 0 8px var(--accent-glow);
+      pointer-events: none;
+    }
+
+    /* ── Starscape ── */
+    #starscape {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0; pointer-events: none; opacity: 0.45;
+    }
+
+    /* ── Loader ── */
+    #loader {
+      position: fixed; inset: 0;
+      background: #0D0B09;
+      z-index: 9999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2rem;
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; }
+
+    .loader-brand {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 900;
+      color: var(--text-primary);
+      text-align: center;
+      line-height: 1.1;
+    }
+    .loader-brand em { font-style: italic; color: var(--accent-bright); }
+    .loader-brand span {
+      display: block;
+      font-size: 0.42em; font-weight: 400; font-style: italic;
+      color: var(--text-secondary); letter-spacing: 0.12em;
+      margin-top: 0.4em;
+    }
+    .loader-bar-wrap {
+      width: min(280px, 60vw); height: 3px;
+      background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden;
+    }
+    #loader-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+      border-radius: 2px; transition: width 0.2s ease;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    #loader-text {
+      font-family: var(--font-cap);
+      font-size: 0.7rem; letter-spacing: 0.3em;
+      color: var(--text-secondary); text-transform: uppercase;
+    }
+
+    /* ── Navbar ── */
+    #navbar {
+      position: fixed; top: 1.2rem; left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 3rem); max-width: 1400px;
+      z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 1.8rem;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #navbar.scrolled {
+      max-width: 840px;
+      border-radius: 50px;
+      background: rgba(16, 11, 9, 0.9);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(156,0,0,0.08);
+    }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--text-primary); text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-brand em { font-style: italic; color: var(--accent-bright); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-cap);
+      font-size: 0.78rem; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-secondary); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-cta {
+      font-family: var(--font-cap);
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.5rem 1.3rem;
+      border: 1px solid var(--accent); border-radius: 3px;
+      color: var(--text-primary); text-decoration: none;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-cta:hover {
+      background: var(--accent);
+      box-shadow: 0 0 18px var(--accent-glow);
+    }
+
+    /* ── Content above starscape ── */
+    main { position: relative; z-index: 1; }
+
+    /* ── Hero ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 6rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(120px); pointer-events: none;
+    }
+    .orb-1 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(156,0,0,0.16) 0%, transparent 70%);
+      top: -120px; left: -120px;
+    }
+    .orb-2 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(100,0,0,0.11) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-cap);
+      font-size: 0.7rem; letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--accent-bright);
+      display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 1.6rem;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; display: block;
+      width: 38px; height: 1px; background: var(--accent);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3.2rem, 10vw, 8.5rem);
+      font-weight: 900; line-height: 0.93;
+      letter-spacing: -0.02em; color: var(--text-primary);
+      margin-bottom: 1.6rem;
+      text-shadow: 0 2px 60px rgba(0,0,0,0.6);
+    }
+    .hero-title em { font-style: italic; color: var(--accent-bright); }
+    .hero-sub {
+      font-family: var(--font-body);
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      font-style: italic; font-weight: 300;
+      color: var(--text-secondary);
+      max-width: 520px; line-height: 1.75; margin-bottom: 3rem;
+    }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      font-family: var(--font-cap);
+      font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 1rem 2.2rem;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 3px;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-primary:hover {
+      background: var(--accent-bright);
+      box-shadow: 0 0 30px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      font-family: var(--font-cap);
+      font-size: 0.78rem; font-weight: 500;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 1rem 2.2rem;
+      background: transparent; color: var(--text-secondary);
+      border: 1px solid rgba(255,255,255,0.14); border-radius: 3px;
+      cursor: pointer; text-decoration: none; transition: all 0.25s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.35); color: var(--text-primary);
+    }
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.5rem;
+      opacity: 0.45; animation: bob 2.2s ease-in-out infinite;
+    }
+    .scroll-hint span {
+      font-family: var(--font-cap);
+      font-size: 0.6rem; letter-spacing: 0.3em;
+      color: var(--text-secondary); text-transform: uppercase;
+    }
+    @keyframes bob {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(7px); }
+    }
+
+    /* ── Scroll Animation Section ── */
+    #scroll-animation { position: relative; height: 400vh; }
+    .scroll-sticky {
+      position: sticky; top: 0; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #frame-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* Annotation Cards */
+    .ann-card {
+      position: absolute;
+      background: rgba(16, 10, 8, 0.85);
+      backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 1.2rem 1.5rem; max-width: 255px;
+      opacity: 0; transform: translateY(14px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+      pointer-events: none;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(156,0,0,0.1);
+    }
+    .ann-card.visible { opacity: 1; transform: translateY(0); }
+    .ann-card.pos-lt { left: 4%; top: 22%; }
+    .ann-card.pos-rt { right: 4%; top: 22%; }
+    .ann-card.pos-lb { left: 4%; bottom: 22%; }
+    .ann-card.pos-rb { right: 4%; bottom: 22%; }
+
+    .ann-num {
+      font-family: var(--font-cap);
+      font-size: 0.62rem; letter-spacing: 0.25em;
+      color: var(--accent-bright); margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+    .ann-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 0.4rem; line-height: 1.2;
+    }
+    .ann-desc {
+      font-family: var(--font-body);
+      font-size: 0.8rem; font-style: italic;
+      color: var(--text-secondary); line-height: 1.55;
+    }
+
+    /* ── Section Shared ── */
+    .section-label {
+      font-family: var(--font-cap);
+      font-size: 0.7rem; letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--accent-bright); text-align: center; margin-bottom: 0.8rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 700;
+      color: var(--text-primary); text-align: center; margin-bottom: 1rem;
+    }
+    .section-sub {
+      font-family: var(--font-body);
+      font-size: 1rem; font-style: italic;
+      color: var(--text-secondary); text-align: center;
+      max-width: 480px; margin: 0 auto 1.5rem; line-height: 1.75;
+    }
+    .divider {
+      width: 56px; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+      margin: 0 auto 3.5rem;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* ── Specs ── */
+    #specs { padding: 8rem 2rem; }
+    .specs-inner { max-width: 1000px; margin: 0 auto; }
+    .specs-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    }
+    .spec-item {
+      padding: 2.8rem 1.5rem; text-align: center;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .spec-item:last-child { border-right: none; }
+    .spec-item::after {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0; transition: opacity 0.6s;
+    }
+    .spec-item.counted::after { opacity: 1; }
+    .spec-num {
+      font-family: var(--font-cap);
+      font-size: clamp(2.6rem, 5vw, 4.2rem); font-weight: 700;
+      color: var(--text-primary); line-height: 1; margin-bottom: 0.5rem;
+    }
+    .spec-num.counting {
+      color: var(--accent-bright);
+      text-shadow: 0 0 22px var(--accent-glow);
+    }
+    .spec-label {
+      font-family: var(--font-cap);
+      font-size: 0.62rem; letter-spacing: 0.24em;
+      text-transform: uppercase; color: var(--text-secondary);
+    }
+
+    /* ── Services ── */
+    #services { padding: 6rem 2rem 8rem; }
+    .services-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+      gap: 1.2rem; max-width: 1080px; margin: 0 auto;
+    }
+    .svc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 18px;
+      padding: 2rem;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      transition: all 0.3s ease; position: relative; overflow: hidden;
+    }
+    .svc-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at top left, rgba(156,0,0,0.09) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .svc-card:hover {
+      border-color: rgba(156,0,0,0.45); transform: translateY(-3px);
+      box-shadow: 0 14px 44px rgba(0,0,0,0.45), 0 0 0 1px rgba(156,0,0,0.18);
+    }
+    .svc-card:hover::before { opacity: 1; }
+    .svc-icon { font-size: 1.9rem; margin-bottom: 1rem; display: block; }
+    .svc-name {
+      font-family: var(--font-display);
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 0.5rem;
+    }
+    .svc-desc {
+      font-family: var(--font-body);
+      font-size: 0.875rem; font-style: italic;
+      color: var(--text-secondary); line-height: 1.65;
+    }
+
+    /* ── CTA ── */
+    #cta {
+      padding: 8rem 2rem; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-orb {
+      position: absolute;
+      width: 640px; height: 640px;
+      background: radial-gradient(circle, rgba(156,0,0,0.13) 0%, transparent 70%);
+      border-radius: 50%;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      filter: blur(60px); pointer-events: none;
+    }
+    .cta-inner { position: relative; z-index: 1; }
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5.5vw, 4.5rem); font-weight: 900;
+      color: var(--text-primary); margin-bottom: 1rem; line-height: 1.05;
+    }
+    .cta-title em { font-style: italic; color: var(--accent-bright); }
+    .cta-sub {
+      font-family: var(--font-body);
+      font-size: 1.05rem; font-style: italic;
+      color: var(--text-secondary); margin-bottom: 2.5rem; line-height: 1.75;
+    }
+    .cta-details {
+      display: flex; gap: 3.5rem; justify-content: center;
+      flex-wrap: wrap; margin-top: 3rem;
+    }
+    .cta-detail { text-align: center; }
+    .cta-detail-label {
+      font-family: var(--font-cap);
+      font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--text-secondary); margin-bottom: 0.3rem;
+    }
+    .cta-detail-value {
+      font-family: var(--font-display);
+      font-size: 1rem; font-weight: 700; color: var(--text-primary);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem; text-align: center;
+    }
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 0.4rem;
+    }
+    .footer-brand em { font-style: italic; color: var(--accent-bright); }
+    .footer-tag {
+      font-family: var(--font-body);
+      font-size: 0.85rem; font-style: italic;
+      color: var(--text-secondary); margin-bottom: 1.6rem;
+    }
+    .footer-links {
+      display: flex; gap: 2rem; justify-content: center;
+      flex-wrap: wrap; list-style: none; margin-bottom: 2rem;
+    }
+    .footer-links a {
+      font-family: var(--font-cap);
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-secondary); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text-primary); }
+    .footer-copy {
+      font-family: var(--font-cap);
+      font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: rgba(156,140,124,0.35);
+    }
+
+    /* ── Team Gallery ── */
+    #team { padding: 6rem 2rem 8rem; }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .team-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all 0.35s ease;
+      position: relative;
+    }
+    .team-card:hover {
+      border-color: rgba(156,0,0,0.45);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(156,0,0,0.18);
+    }
+    .team-photo {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: #0d0a08;
+      position: relative;
+    }
+    .team-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: top center;
+      display: block;
+      transition: transform 0.45s ease;
+      filter: grayscale(15%);
+    }
+    .team-card:hover .team-photo img {
+      transform: scale(1.04);
+      filter: grayscale(0%);
+    }
+    .team-photo-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 55%, rgba(16,10,8,0.85) 100%);
+      pointer-events: none;
+    }
+    .team-info {
+      padding: 1.1rem 1.2rem 1.3rem;
+      border-top: 1px solid var(--border);
+    }
+    .team-name {
+      font-family: var(--font-display);
+      font-size: 1rem; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 0.2rem;
+      line-height: 1.25;
+    }
+    .team-role {
+      font-family: var(--font-cap);
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent-bright); margin-bottom: 0.5rem;
+    }
+    .team-exp {
+      font-family: var(--font-cap);
+      font-size: 0.62rem; letter-spacing: 0.1em;
+      color: var(--text-secondary); text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+    .team-specs {
+      font-family: var(--font-body);
+      font-size: 0.78rem; font-style: italic;
+      color: var(--text-secondary); line-height: 1.55;
+    }
+    .team-card.dog .team-role { color: #CC8800; }
+    .team-card.dog .team-photo img { object-position: center; }
+
+    /* ── Mobile ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      #scroll-animation { height: 280vh; }
+      .ann-card .ann-desc { display: none; }
+      .ann-card { padding: 0.75rem 1rem; }
+      .ann-card.pos-lt { left: 2%; top: auto; bottom: 12%; }
+      .ann-card.pos-rt { right: 2%; top: auto; bottom: 12%; }
+      .ann-card.pos-lb { left: 2%; bottom: 5%; }
+      .ann-card.pos-rb { right: 2%; bottom: 5%; }
+      .specs-grid { grid-template-columns: repeat(2, 1fr); }
+      .spec-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .spec-item:nth-child(odd) { border-right: 1px solid var(--border); }
+      .spec-item:last-child { border-bottom: none; }
+    }
+    @media (max-width: 480px) {
+      .cta-details { gap: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+<canvas id="starscape"></canvas>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-brand">
+    Jerry's <em>Automotive</em>
+    <span>Repair, Inc. — Hattiesburg, MS</span>
+  </div>
+  <div class="loader-bar-wrap">
+    <div id="loader-bar"></div>
+  </div>
+  <div id="loader-text">Loading…</div>
+</div>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <a href="#" class="nav-brand">Jerry's <em>Automotive</em></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#team">Our Team</a></li>
+    <li><a href="#specs">About</a></li>
+    <li><a href="#cta">Contact</a></li>
+  </ul>
+  <a href="tel:6015822772" class="nav-cta">Call Now</a>
+</nav>
+
+<main>
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="hero-orb orb-1"></div>
+    <div class="hero-orb orb-2"></div>
+
+    <div class="hero-eyebrow">Hattiesburg, Mississippi</div>
+
+    <h1 class="hero-title">
+      Focus on<br><em>Quality.</em>
+    </h1>
+
+    <p class="hero-sub">
+      Honest repairs. Fair prices. No surprises — ever.
+      Jerry's Automotive has been keeping Hattiesburg rolling, one car at a time.
+    </p>
+
+    <div class="hero-btns">
+      <a href="tel:6015822772" class="btn-primary">Call 601-582-2772</a>
+      <a href="#services" class="btn-secondary">Our Services</a>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <svg width="16" height="24" viewBox="0 0 16 24" fill="none"
+           stroke="currentColor" stroke-width="1.5" color="var(--text-secondary)">
+        <rect x="1" y="1" width="14" height="22" rx="7"/>
+        <circle cx="8" cy="8" r="2" fill="currentColor" stroke="none">
+          <animate attributeName="cy" values="8;14;8" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Scroll Animation -->
+  <section id="scroll-animation">
+    <div class="scroll-sticky">
+      <canvas id="frame-canvas"></canvas>
+
+      <div class="ann-card pos-lt" data-show="0.12" data-hide="0.32">
+        <div class="ann-num">01 — Diagnostics</div>
+        <div class="ann-title">Engine Performance</div>
+        <div class="ann-desc">Analysis, testing & precision tune-up to keep your engine running right.</div>
+      </div>
+
+      <div class="ann-card pos-rt" data-show="0.32" data-hide="0.52">
+        <div class="ann-num">02 — Handling</div>
+        <div class="ann-title">Brakes & Suspension</div>
+        <div class="ann-desc">Brakes, shocks, struts and CV axles — stop with confidence every time.</div>
+      </div>
+
+      <div class="ann-card pos-lb" data-show="0.52" data-hide="0.72">
+        <div class="ann-num">03 — Comfort</div>
+        <div class="ann-title">Climate Control</div>
+        <div class="ann-desc">A/C and heater repair built for Mississippi's demanding seasons.</div>
+      </div>
+
+      <div class="ann-card pos-rb" data-show="0.72" data-hide="0.92">
+        <div class="ann-num">04 — Drivetrain</div>
+        <div class="ann-title">Major Repairs</div>
+        <div class="ann-desc">Engines, transmissions & differentials — rebuilt right, the first time.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Specs -->
+  <section id="specs">
+    <div class="specs-inner">
+      <div class="section-label">By The Numbers</div>
+      <h2 class="section-title">Built on Trust & Expertise</h2>
+      <div class="divider"></div>
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-num" data-target="7" data-suffix="+">0+</div>
+          <div class="spec-label">Expert Services</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-num" data-target="10" data-suffix=" hrs">0 hrs</div>
+          <div class="spec-label">Open Each Day</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-num" data-target="100" data-suffix="%">0%</div>
+          <div class="spec-label">Customer Authorization</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-num" data-target="5" data-suffix=" days">0 days</div>
+          <div class="spec-label">Every Week</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services">
+    <div class="section-label">What We Do</div>
+    <h2 class="section-title">Full-Service Auto Repair</h2>
+    <p class="section-sub">From a simple oil change to a complete engine rebuild — one shop, done right.</p>
+    <div class="divider"></div>
+
+    <div class="services-grid">
+      <div class="svc-card">
+        <span class="svc-icon">⚙️</span>
+        <div class="svc-name">Engine Performance</div>
+        <div class="svc-desc">Analysis, testing and tune-up to keep your engine running at its best.</div>
+      </div>
+      <div class="svc-card">
+        <span class="svc-icon">🔧</span>
+        <div class="svc-name">Brakes & Suspension</div>
+        <div class="svc-desc">Brakes, shocks, struts and CV axles — expert installation and repair.</div>
+      </div>
+      <div class="svc-card">
+        <span class="svc-icon">❄️</span>
+        <div class="svc-name">Climate Control</div>
+        <div class="svc-desc">Air conditioner and heater repair for year-round comfort on every road.</div>
+      </div>
+      <div class="svc-card">
+        <span class="svc-icon">⏱️</span>
+        <div class="svc-name">Timing & Gaskets</div>
+        <div class="svc-desc">Timing belts, chains and cylinder head gaskets repaired with precision.</div>
+      </div>
+      <div class="svc-card">
+        <span class="svc-icon">🏎️</span>
+        <div class="svc-name">Major Repairs</div>
+        <div class="svc-desc">Engines, transmissions and differentials — rebuilt to last.</div>
+      </div>
+      <div class="svc-card">
+        <span class="svc-icon">🛢️</span>
+        <div class="svc-name">Scheduled Maintenance</div>
+        <div class="svc-desc">Dealer scheduled maintenance and oil changes to protect your investment.</div>
+      </div>
+      <div class="svc-card">
+        <span class="svc-icon">🔩</span>
+        <div class="svc-name">Parts Purchasing</div>
+        <div class="svc-desc">Quality parts sourced and supplied — the right part, the first time.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Gallery -->
+  <section id="team">
+    <div class="section-label">Our People</div>
+    <h2 class="section-title">The Team Behind the Work</h2>
+    <p class="section-sub">Decades of combined experience. One shared commitment — quality repairs at a fair price.</p>
+    <div class="divider"></div>
+
+    <div class="team-grid">
+
+      <div class="team-card">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/IMG_3736.JPG" alt="Tom Callahan" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Tom Callahan</div>
+          <div class="team-role">Owner</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/IMG_0255.jpg" alt="Gary Gleason" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Gary Gleason</div>
+          <div class="team-role">Service Manager</div>
+          <div class="team-exp">31 Years Experience</div>
+          <div class="team-specs">Managing repairs, estimates & ensuring quality at a fair price.</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/image1_4.jpeg" alt="Connie Callahan" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Connie Callahan</div>
+          <div class="team-role">Office Manager</div>
+          <div class="team-exp">22 Years Experience</div>
+          <div class="team-specs">Benefits, finances & corporate operations exceeding $900K annually.</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/image1_5.jpeg" alt="Jordan Callahan" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Jordan Callahan</div>
+          <div class="team-role">Office Assistant</div>
+          <div class="team-exp">5 Years Experience</div>
+          <div class="team-specs">Invoices, payments, payroll & customer satisfaction follow-ups.</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/IMG_35111.JPG" alt="Linda Hillman" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Linda Hillman</div>
+          <div class="team-role">Parts Expediter</div>
+          <div class="team-exp">15 Years Experience</div>
+          <div class="team-specs">Sourcing the highest quality parts at the best cost for every customer.</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/IMG_0247.jpg" alt="Clay Taylor" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Clay Taylor</div>
+          <div class="team-role">Shop Leadperson</div>
+          <div class="team-exp">33 Years Experience</div>
+          <div class="team-specs">Fleet repair, brakes, engine cooling, diesel diagnostics & suspension.</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/IMG_0245.jpg" alt="Dennis Craig" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Dennis Craig</div>
+          <div class="team-role">Technician</div>
+          <div class="team-exp">24 Years Experience</div>
+          <div class="team-specs">Foreign gas engine diagnostics, suspension, cooling & A/C systems.</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/IMG_0248.jpg" alt="Robert Barnes" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Robert Barnes</div>
+          <div class="team-role">Technician</div>
+          <div class="team-exp">10 Years Experience</div>
+          <div class="team-specs">Starting & charging systems, brakes, pre-purchase inspections & tires.</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/IMG_0253.jpg" alt="Mike Roberson" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Mike Roberson</div>
+          <div class="team-role">Technician</div>
+          <div class="team-exp">28 Years Experience</div>
+          <div class="team-specs">A/C, brakes, cooling systems, starting & charging, engine & transmission.</div>
+        </div>
+      </div>
+
+      <div class="team-card dog">
+        <div class="team-photo">
+          <img src="http://www.jerrysautorepairinc.com/images/Roscoe.jpg" alt="Roscoe Callahan" loading="lazy">
+          <div class="team-photo-overlay"></div>
+        </div>
+        <div class="team-info">
+          <div class="team-name">Roscoe Callahan</div>
+          <div class="team-role">Shop Dog</div>
+          <div class="team-exp">3 Years Experience</div>
+          <div class="team-specs">Making customers smile & napping on the desk.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta">
+    <div class="cta-orb"></div>
+    <div class="cta-inner">
+      <div class="section-label">Get In Touch</div>
+      <h2 class="cta-title">Ready to Get Back<br>on the <em>Road?</em></h2>
+      <p class="cta-sub">
+        No surprises. No runaround. Just quality repairs at a fair price.<br>
+        Call us today — we'll take care of the rest.
+      </p>
+      <div class="hero-btns">
+        <a href="tel:6015822772" class="btn-primary">Call 601-582-2772</a>
+        <a href="https://maps.google.com/?q=5101+Old+Highway+42,+Hattiesburg,+MS+39401"
+           target="_blank" rel="noopener" class="btn-secondary">Get Directions</a>
+      </div>
+      <div class="cta-details">
+        <div class="cta-detail">
+          <div class="cta-detail-label">Address</div>
+          <div class="cta-detail-value">5101 Old Highway 42, Hattiesburg, MS</div>
+        </div>
+        <div class="cta-detail">
+          <div class="cta-detail-label">Hours</div>
+          <div class="cta-detail-value">Mon–Fri &nbsp;7:30 am – 5:30 pm</div>
+        </div>
+        <div class="cta-detail">
+          <div class="cta-detail-label">Phone</div>
+          <div class="cta-detail-value">601-582-2772</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-brand">Jerry's <em>Automotive</em> Repair, Inc.</div>
+  <div class="footer-tag">Focus on Quality — Hattiesburg, Mississippi</div>
+  <ul class="footer-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#team">Our Team</a></li>
+    <li><a href="#specs">About</a></li>
+    <li><a href="#cta">Contact</a></li>
+    <li><a href="tel:6015822772">601-582-2772</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Jerry's Automotive Repair, Inc. · 5101 Old Hwy 42, Hattiesburg MS 39401</div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────
+const TOTAL_FRAMES  = 106;
+const SNAP_ZONES    = [0.12, 0.32, 0.52, 0.72];
+const SNAP_RADIUS   = 0.025;
+const HOLD_MS       = 580;
+
+const frameSrc = (i) => `frames/frame_${String(i).padStart(4,'0')}.jpg`;
+
+// ─────────────────────────────────────────────
+// STARSCAPE
+// ─────────────────────────────────────────────
+(function () {
+  const c   = document.getElementById('starscape');
+  const ctx = c.getContext('2d');
+  const stars = [];
+
+  function resize() {
+    const dpr = devicePixelRatio;
+    c.width  = innerWidth  * dpr;
+    c.height = innerHeight * dpr;
+    c.style.width  = innerWidth  + 'px';
+    c.style.height = innerHeight + 'px';
+  }
+
+  function mkStars() {
+    stars.length = 0;
+    for (let i = 0; i < 190; i++) stars.push({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.1 + 0.3,
+      drift: (Math.random() - 0.5) * 0.00008,
+      ts: Math.random() * 0.02 + 0.005,
+      tp: Math.random() * Math.PI * 2,
+      base: Math.random() * 0.5 + 0.08,
+    });
+  }
+
+  let t = 0;
+  function draw() {
+    t++;
+    ctx.clearRect(0, 0, c.width, c.height);
+    const W = c.width, H = c.height, dpr = devicePixelRatio;
+    stars.forEach(s => {
+      s.x = (s.x + s.drift + 1) % 1;
+      const op = s.base * (0.55 + 0.45 * Math.sin(t * s.ts + s.tp));
+      ctx.beginPath();
+      ctx.arc(s.x * W, s.y * H, s.r * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(245,240,235,${op})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); mkStars(); });
+  resize(); mkStars(); draw();
+})();
+
+// ─────────────────────────────────────────────
+// FRAME LOADER
+// ─────────────────────────────────────────────
+const images     = new Array(TOTAL_FRAMES);
+let   loadedCnt  = 0;
+const loaderBar  = document.getElementById('loader-bar');
+const loaderTxt  = document.getElementById('loader-text');
+const loaderEl   = document.getElementById('loader');
+
+function preload() {
+  for (let i = 0; i < TOTAL_FRAMES; i++) {
+    const img = new Image();
+    img.onload = img.onerror = () => {
+      loadedCnt++;
+      const p = Math.round(loadedCnt / TOTAL_FRAMES * 100);
+      loaderBar.style.width = p + '%';
+      loaderTxt.textContent = `Loading ${p}%`;
+      if (loadedCnt === TOTAL_FRAMES) allLoaded();
+    };
+    img.src   = frameSrc(i + 1);
+    images[i] = img;
+  }
+}
+
+function allLoaded() {
+  loaderTxt.textContent = 'Ready';
+  setTimeout(() => {
+    loaderEl.classList.add('hidden');
+    drawFrame(0);
+  }, 400);
+}
+
+// ─────────────────────────────────────────────
+// CANVAS + DRAWING
+// ─────────────────────────────────────────────
+const canvas = document.getElementById('frame-canvas');
+const fctx   = canvas.getContext('2d');
+let   curIdx = -1;
+
+function resizeCanvas() {
+  const dpr = devicePixelRatio;
+  canvas.width  = innerWidth  * dpr;
+  canvas.height = innerHeight * dpr;
+  canvas.style.width  = innerWidth  + 'px';
+  canvas.style.height = innerHeight + 'px';
+}
+
+function drawFrame(idx) {
+  idx = Math.max(0, Math.min(TOTAL_FRAMES - 1, idx));
+  if (idx === curIdx) return;
+  curIdx = idx;
+  const img = images[idx];
+  if (!img || !img.complete || !img.naturalWidth) return;
+
+  const W = canvas.width, H = canvas.height;
+  const iW = img.naturalWidth, iH = img.naturalHeight;
+  const mobile = innerWidth < 768;
+
+  fctx.clearRect(0, 0, W, H);
+
+  let scale, dW, dH, dX, dY;
+  if (mobile) {
+    scale = Math.min(W / iW, H / iH) * 1.08;
+  } else {
+    scale = Math.max(W / iW, H / iH);
+  }
+  dW = iW * scale; dH = iH * scale;
+  dX = (W - dW) / 2; dY = (H - dH) / 2;
+  fctx.drawImage(img, dX, dY, dW, dH);
+}
+
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  const saved = curIdx;
+  curIdx = -1;
+  drawFrame(saved >= 0 ? saved : 0);
+});
+resizeCanvas();
+
+// ─────────────────────────────────────────────
+// SCROLL ENGINE
+// ─────────────────────────────────────────────
+const scrollSec   = document.getElementById('scroll-animation');
+const annCards    = document.querySelectorAll('.ann-card');
+const progressBar = document.getElementById('scroll-progress');
+const navbar      = document.getElementById('navbar');
+
+let rafPending = null;
+let locked     = false;
+let lastSnap   = -1;
+
+function getProgress() {
+  const rect  = scrollSec.getBoundingClientRect();
+  const range = scrollSec.offsetHeight - innerHeight;
+  return Math.max(0, Math.min(1, -rect.top / range));
+}
+
+function updateAnns(p) {
+  annCards.forEach(c => {
+    const show = parseFloat(c.dataset.show);
+    const hide = parseFloat(c.dataset.hide);
+    c.classList.toggle('visible', p >= show && p < hide);
+  });
+}
+
+function scheduleFrame(idx) {
+  rafPending = idx;
+  if (!rafPending && rafPending !== 0) return;
+  requestAnimationFrame(() => {
+    if (rafPending !== null) { drawFrame(rafPending); rafPending = null; }
+  });
+}
+
+function snapTo(zoneProgress) {
+  locked = true;
+  const top   = scrollSec.offsetTop;
+  const range = scrollSec.offsetHeight - innerHeight;
+  window.scrollTo({ top: top + zoneProgress * range, behavior: 'smooth' });
+  setTimeout(() => { locked = false; }, HOLD_MS);
+}
+
+window.addEventListener('scroll', () => {
+  // Progress bar
+  const total = document.documentElement.scrollHeight - innerHeight;
+  progressBar.style.width = (scrollY / total * 100) + '%';
+
+  // Navbar pill
+  navbar.classList.toggle('scrolled', scrollY > 80);
+
+  // Frame + annotations
+  const p   = getProgress();
+  const idx = Math.floor(p * (TOTAL_FRAMES - 1));
+  rafPending = idx;
+  requestAnimationFrame(() => {
+    if (rafPending !== null) { drawFrame(rafPending); rafPending = null; }
+  });
+  updateAnns(p);
+
+  // Snap-stop
+  if (!locked) {
+    let snapped = false;
+    for (let i = 0; i < SNAP_ZONES.length; i++) {
+      if (Math.abs(p - SNAP_ZONES[i]) < SNAP_RADIUS && lastSnap !== i) {
+        lastSnap = i;
+        snapTo(SNAP_ZONES[i]);
+        snapped = true;
+        break;
+      }
+    }
+    if (!snapped && SNAP_ZONES.every(z => Math.abs(p - z) > SNAP_RADIUS * 3)) {
+      lastSnap = -1;
+    }
+  }
+}, { passive: true });
+
+// ─────────────────────────────────────────────
+// COUNT-UP
+// ─────────────────────────────────────────────
+function easeOutExpo(t) { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+
+function countUp(el) {
+  const target = parseInt(el.dataset.target, 10);
+  const suffix = el.dataset.suffix || '';
+  const dur    = 1800;
+  const t0     = performance.now();
+  el.classList.add('counting');
+  el.closest('.spec-item').classList.add('counted');
+  (function tick(now) {
+    const e = Math.min((now - t0) / dur, 1);
+    el.textContent = Math.round(easeOutExpo(e) * target) + suffix;
+    if (e < 1) requestAnimationFrame(tick);
+    else { el.textContent = target + suffix; el.classList.remove('counting'); }
+  })(t0);
+}
+
+const specNums = document.querySelectorAll('.spec-num[data-target]');
+const specObs  = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { countUp(e.target); specObs.unobserve(e.target); }
+  });
+}, { threshold: 0.4 });
+specNums.forEach(n => specObs.observe(n));
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+preload();
+</script>
+</body>
+</html>
