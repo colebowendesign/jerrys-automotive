@@ -644,9 +644,75 @@
       margin-top: 1.5rem; line-height: 1.65;
     }
 
-    /* ── Mobile ── */
+    /* ── Hamburger ── */
+    #nav-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px 4px;
+      z-index: 10;
+    }
+    #nav-toggle span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: transform 0.25s, opacity 0.25s;
+    }
+    #navbar.open #nav-toggle span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    #navbar.open #nav-toggle span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    #navbar.open #nav-toggle span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    /* ── Mobile 768px ── */
     @media (max-width: 768px) {
-      .nav-links { display: none; }
+      body { background-attachment: scroll; }
+
+      #nav-toggle { display: flex; }
+      #navbar.scrolled { max-width: calc(100% - 2rem); }
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 0; right: 0;
+        background: rgba(14, 10, 8, 0.97);
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 0.5rem 0;
+        gap: 0;
+        list-style: none;
+      }
+      #navbar.open .nav-links { display: flex; }
+      .nav-links li a {
+        display: block;
+        padding: 0.85rem 1.4rem;
+        font-size: 0.82rem;
+        border-bottom: 1px solid rgba(156,0,0,0.1);
+        width: 100%;
+      }
+      .nav-links li:last-child a { border-bottom: none; }
+
+      #hero { padding: 5rem 1.5rem 3.5rem; }
+      #specs { padding: 4rem 1.5rem; }
+      #services { padding: 3.5rem 1.5rem 4.5rem; }
+      #fleet { padding: 3.5rem 1.5rem 4.5rem; }
+      #rates { padding: 3.5rem 1.5rem 4.5rem; }
+      #team { padding: 3.5rem 1.5rem 4.5rem; }
+      #cta { padding: 4rem 1.5rem; }
+
+      .divider { margin-bottom: 2.5rem; }
+      .spec-item { padding: 1.8rem 1rem; }
+      .specs-grid { grid-template-columns: repeat(2, 1fr); }
+      .spec-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .spec-item:nth-child(odd) { border-right: 1px solid var(--border); }
+      .spec-item:last-child { border-bottom: none; }
+
       #scroll-animation { height: 280vh; }
       .ann-card .ann-desc { display: none; }
       .ann-card { padding: 0.75rem 1rem; }
@@ -654,13 +720,24 @@
       .ann-card.pos-rt { right: 2%; top: auto; bottom: 12%; }
       .ann-card.pos-lb { left: 2%; bottom: 5%; }
       .ann-card.pos-rb { right: 2%; bottom: 5%; }
-      .specs-grid { grid-template-columns: repeat(2, 1fr); }
-      .spec-item { border-right: none; border-bottom: 1px solid var(--border); }
-      .spec-item:nth-child(odd) { border-right: 1px solid var(--border); }
-      .spec-item:last-child { border-bottom: none; }
+
+      .rate-row { padding: 0.75rem 1rem; }
+      .rate-shop { font-size: 0.82rem; }
+      .rate-price { font-size: 0.78rem; }
+
+      .footer-links { gap: 1.2rem; }
     }
+
+    /* ── Mobile 480px ── */
     @media (max-width: 480px) {
-      .cta-details { gap: 2rem; }
+      .hero-btns { flex-direction: column; align-items: stretch; }
+      .btn-primary, .btn-secondary { text-align: center; padding: 1rem 1.5rem; }
+
+      .cta-details { flex-direction: column; align-items: center; gap: 1.5rem; }
+      .cta-detail-value { font-size: 0.9rem; }
+
+      .fleet-clients-grid { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -711,6 +788,9 @@
     <li><a href="#cta">Contact</a></li>
   </ul>
   <a href="tel:6015822772" class="nav-cta">Call Now</a>
+  <button id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <main>
@@ -1424,6 +1504,31 @@ const specObs  = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.4 });
 specNums.forEach(n => specObs.observe(n));
+
+// ─────────────────────────────────────────────
+// HAMBURGER MENU
+// ─────────────────────────────────────────────
+const navToggle = document.getElementById('nav-toggle');
+const navEl     = document.getElementById('navbar');
+
+navToggle.addEventListener('click', () => {
+  const open = navEl.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', open);
+});
+
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('click', () => {
+    navEl.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  });
+});
+
+document.addEventListener('click', (e) => {
+  if (!navEl.contains(e.target)) {
+    navEl.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+});
 
 // ─────────────────────────────────────────────
 // INIT
