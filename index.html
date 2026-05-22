@@ -371,6 +371,24 @@
       text-transform: uppercase; color: var(--text-secondary);
     }
 
+    /* ── Mission Statement ── */
+    #mission { padding: 6rem 2rem; background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .mission-wrap { max-width: 780px; margin: 0 auto; text-align: center; }
+    .mission-quote {
+      font-family: var(--font-body);
+      font-size: 1.08rem; line-height: 1.85;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 2rem;
+    }
+    .mission-quote::before { content: '\201C'; font-size: 3rem; line-height: 0; vertical-align: -0.6rem; color: var(--accent-bright); margin-right: 0.15em; font-style: normal; }
+    .mission-quote::after  { content: '\201D'; font-size: 3rem; line-height: 0; vertical-align: -0.6rem; color: var(--accent-bright); margin-left: 0.15em; font-style: normal; }
+    .mission-attribution {
+      font-family: var(--font-cap);
+      font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent-bright);
+    }
+
     /* ── Services ── */
     #services { padding: 6rem 2rem 8rem; }
     .services-grid {
@@ -888,6 +906,16 @@
     </div>
   </section>
 
+  <!-- Mission Statement -->
+  <section id="mission">
+    <div class="mission-wrap">
+      <div class="section-label">Our Promise</div>
+      <h2 class="section-title" style="margin-bottom:2rem;">Our Mission</h2>
+      <p class="mission-quote">Thank you for allowing our team to perform your vehicle repair needs. We understand that vehicles in need of repair can be one of your greatest dilemmas at that particular moment. It is our intention to perform quality repairs at a fair price the first time — that's guaranteed! It is also our intention to treat all customers with respect and concern for your needs. Our policy is no surprises; that is why we will not perform repairs without first receiving customer authorization. You see, our team understands that our customers can be our greatest asset. Thank you for allowing our team to serve you.</p>
+      <div class="mission-attribution">— Tom Callahan &nbsp;|&nbsp; Owner, Jerry's Automotive Repair, Inc.</div>
+    </div>
+  </section>
+
   <!-- Services -->
   <section id="services">
     <div class="section-label">What We Do</div>
@@ -1173,6 +1201,10 @@
         <div class="cta-detail">
           <div class="cta-detail-label">Phone</div>
           <div class="cta-detail-value"><a href="tel:6015822772" style="color:inherit;text-decoration:none">601-582-2772</a> or <a href="tel:6015445250" style="color:inherit;text-decoration:none">601-544-5250</a></div>
+        </div>
+        <div class="cta-detail">
+          <div class="cta-detail-label">Email</div>
+          <div class="cta-detail-value"><a href="mailto:jerryscenter@bellsouth.net" style="color:inherit;text-decoration:none">jerryscenter@bellsouth.net</a></div>
         </div>
       </div>
     </div>
